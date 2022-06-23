@@ -17,19 +17,26 @@ import fr.diginamic.recensement.entites.Ville;
 public class RecherchePopulationBorneService extends MenuService {
 
 	@Override
-	public void traiter(Recensement rec, Scanner scanner) {
+	public void traiter(Recensement rec, Scanner scanner) throws Exception {
 
 		System.out.println("Quel est le code du département recherché ? ");
 		String choix = scanner.nextLine();
 
+		if (choix == null || choix.equals(""))
+			throw new Exception("Code département incorrect");
+		
 		System.out.println("Choississez une population minimum (en milliers d'habitants): ");
 		String saisieMin = scanner.nextLine();
+
+		int min = parseIntOr(saisieMin, "Saisie min incorrecte") * 1000;
 		
 		System.out.println("Choississez une population maximum (en milliers d'habitants): ");
 		String saisieMax = scanner.nextLine();
 
-		int min = Integer.parseInt(saisieMin) * 1000;
-		int max = Integer.parseInt(saisieMax) * 1000;
+		int max = parseIntOr(saisieMax, "Saisie max incorrecte") * 1000;
+		
+		if (min < 0 || max < 0 || min > max)
+			throw new Exception("Saisie min/max incorrecte");
 		
 		List<Ville> villes = rec.getVilles();
 		for (Ville ville : villes) {
@@ -41,4 +48,15 @@ public class RecherchePopulationBorneService extends MenuService {
 		}
 	}
 
+	private int parseIntOr(String in, String error) throws Exception
+	{
+		try
+		{
+			return Integer.parseInt(in);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new Exception(error);
+		}
+	}
 }
